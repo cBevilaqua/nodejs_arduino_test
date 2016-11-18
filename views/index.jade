@@ -1,0 +1,16 @@
+extends layout
+
+block content
+	h1= title
+	p Welcome to #{title}
+	div.row
+		div.col-lg-2
+			button.btn.btn-success(ng-click="ligar()") Ligar
+		div.col-lg-2
+			button.btn.btn-danger(ng-click="desligar()") Desligar
+	div.row
+		div.col-lg-6
+			input(type="range", step="1", min="100", max="1000", ng-model="strobeSpeed")
+	div.row
+		div.col-lg-6
+			pre Strobe Speed {{strobeSpeed}}
