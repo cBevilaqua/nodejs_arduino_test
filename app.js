@@ -5,7 +5,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var fs = require('fs'),
-    five = require('johnny-five');
+five = require('johnny-five');
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
@@ -14,7 +14,7 @@ var app = express();
 
 var http = require('http');
 var server = http.createServer(app);
-var io = require('socket.io').listen(server);
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -33,9 +33,9 @@ app.use('/users', users);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  var err = new Error('Not Found');
-  err.status = 404;
-  next(err);
+	var err = new Error('Not Found');
+	err.status = 404;
+	next(err);
 });
 
 // error handlers
@@ -43,23 +43,23 @@ app.use(function(req, res, next) {
 // development error handler
 // will print stacktrace
 if (app.get('env') === 'development') {
-  app.use(function(err, req, res, next) {
-    res.status(err.status || 500);
-    res.render('error', {
-      message: err.message,
-      error: err
-    });
-  });
+	app.use(function(err, req, res, next) {
+		res.status(err.status || 500);
+		res.render('error', {
+			message: err.message,
+			error: err
+		});
+	});
 }
 
 // production error handler
 // no stacktraces leaked to user
 app.use(function(err, req, res, next) {
-  res.status(err.status || 500);
-  res.render('error', {
-    message: err.message,
-    error: {}
-  });
+	res.status(err.status || 500);
+	res.render('error', {
+		message: err.message,
+		error: {}
+	});
 });
 
 
@@ -67,32 +67,40 @@ app.use(function(err, req, res, next) {
 var board = new five.Board();
 
 board.on("ready", function() {
-  var led = new five.Led(3);
 
-  io.on('connection', function (socket) {
+	var io = require('socket.io').listen(server);
 
-    socket.on('ligar', function(){
-      led.on();
-    });
+	var led = new five.Led(3);
 
-    socket.on('desligar', function(){
-      led.off();
-    });
+	console.log("board ready");
 
-    socket.on('strobe', function(data){
-      led.strobe(parseInt(data));
-    });
+	io.on('connection', function (socket) {
 
-    socket.on('disconnect', function(){
-      led.off();
-    });
+		console.log("io connection");
 
-  }); 
+		socket.on('ligar', function(){
+			led.on();
+		});
+
+		socket.on('desligar', function(){
+	  		//precisamos do stop caso o led esteja em strobe, senao apenas com off nao apaga
+			led.stop().off();
+		});
+
+		socket.on('strobe', function(data){
+			led.strobe(parseInt(data));
+		});
+
+		socket.on('disconnect', function(){
+			led.stop().off();
+		});
+
+	}); 
 });
 
 
 server.listen(3000, function(){
-  console.log("SERVER RUNNING...");
+	console.log("SERVER RUNNING...");
 });
 
 module.exports = app;
