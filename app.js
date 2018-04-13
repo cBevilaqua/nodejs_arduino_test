@@ -98,9 +98,9 @@ board.on("ready", function() {
 	}); 
 });
 
-
-server.listen(3000, function(){
-	console.log("SERVER RUNNING...");
+var port = process.env.PORT || 3000;
+server.listen(port, function(){
+	console.log("SERVER RUNNING ON " + port);
 });
 
 module.exports = app;
