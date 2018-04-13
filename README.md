@@ -14,4 +14,4 @@ And then run the project with:
 ```
 node app.js
 ```
-The application will run at http://localhost:3000, but you could change this in the app.js file.
+The application will run at http://localhost:3000. The server will run on env specified port, falling back to 3000.
